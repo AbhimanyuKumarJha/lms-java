@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: lms
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lms
+    username: lms
+    password: lms
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  cache:
+    type: redis
+    redis:
+      time-to-live: 10m
+      cache-null-values: false
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true
+    consumer:
+      group-id: lms-modular-monolith
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.example.lms.books.events,com.example.lms.borrowing.events,com.example.lms.fines.events,com.example.lms.auth.events,com.example.lms.users.events
+    listener:
+      missing-topics-fatal: false
+server:
+  port: 8080
+
+lms:
+  otp:
+    ttl-minutes: 10
+    secret: change-this-local-dev-otp-secret
