@@ -25,7 +25,6 @@ import java.util.Map;
 public class KafkaClientConfig {
 
     private static final String TRUSTED_EVENT_PACKAGES = String.join(",",
-            "com.example.lms.books.events",
             "com.example.lms.borrowing.events",
             "com.example.lms.fines.events",
             "com.example.lms.auth.events",

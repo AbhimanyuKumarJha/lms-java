@@ -12,9 +12,9 @@ import java.util.Optional;
 
 public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
 
-    long countByBook_BookId(Long bookId);
+    long countByTitle(String title);
 
-    long countByBook_BookIdAndStatus(Long bookId, BookCopyStatus status);
+    long countByTitleAndStatus(String title, BookCopyStatus status);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select bookCopy from BookCopy bookCopy where bookCopy.bookCopyId = :bookCopyId")

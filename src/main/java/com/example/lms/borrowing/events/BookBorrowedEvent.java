@@ -7,7 +7,7 @@ public record BookBorrowedEvent(
         Long transactionId,
         Long userId,
         Long bookCopyId,
-        Long bookId,
+        String title,
         LocalDate issuedAt,
         LocalDate dueDate,
         Instant occurredAt

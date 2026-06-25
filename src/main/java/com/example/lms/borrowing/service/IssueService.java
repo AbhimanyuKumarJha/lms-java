@@ -84,7 +84,7 @@ public class IssueService {
                         savedIssue.getTransactionId(),
                         user.getUserId(),
                         bookCopy.getBookCopyId(),
-                        bookCopy.getBook().getBookId(),
+                        bookCopy.getTitle(),
                         savedIssue.getIssuedAt(),
                         savedIssue.getDueDate(),
                         Instant.now()
@@ -139,7 +139,7 @@ public class IssueService {
                         issue.getTransactionId(),
                         issue.getUser().getUserId(),
                         issue.getBookCopy().getBookCopyId(),
-                        issue.getBookCopy().getBook().getBookId(),
+                        issue.getBookCopy().getTitle(),
                         issue.getReturnedAt(),
                         Instant.now()
                 )

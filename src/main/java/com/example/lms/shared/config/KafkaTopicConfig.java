@@ -15,11 +15,6 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    NewTopic bookAddedTopic() {
-        return topic(EventNames.BOOK_ADDED);
-    }
-
-    @Bean
     NewTopic bookBorrowedTopic() {
         return topic(EventNames.BOOK_BORROWED);
     }

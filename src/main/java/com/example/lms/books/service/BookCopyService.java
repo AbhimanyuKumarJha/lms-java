@@ -1,11 +1,9 @@
 package com.example.lms.books.service;
 
-import com.example.lms.books.model.Book;
+import com.example.lms.books.controllers.BookCopyResponse;
 import com.example.lms.books.model.BookCopy;
 import com.example.lms.books.model.BookCopyStatus;
 import com.example.lms.books.repository.BookCopyRepository;
-import com.example.lms.books.repository.BookRepository;
-import com.example.lms.books.controllers.BookCopyResponse;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -17,18 +15,21 @@ import java.util.List;
 public class BookCopyService {
 
     private final BookCopyRepository bookCopyRepository;
-    private final BookRepository bookRepository;
 
-    public BookCopyService(BookCopyRepository bookCopyRepository, BookRepository bookRepository) {
+    public BookCopyService(BookCopyRepository bookCopyRepository) {
         this.bookCopyRepository = bookCopyRepository;
-        this.bookRepository = bookRepository;
     }
 
     @Transactional
     @CacheEvict(cacheNames = {"book-copies", "book-copy-counts"}, allEntries = true)
-    public BookCopyResponse createBookCopy(Long bookCopyId, Long bookId, String copyCode) {
-        Book book = findBook(bookId);
-        BookCopy bookCopy = new BookCopy(bookCopyId, book, copyCode);
+    public BookCopyResponse createBookCopy(
+            Long bookCopyId,
+            String title,
+            String author,
+            String description,
+            String copyCode
+    ) {
+        BookCopy bookCopy = new BookCopy(bookCopyId, title, author, description, copyCode);
         return BookCopyResponse.from(bookCopyRepository.save(bookCopy));
     }
 
@@ -39,18 +40,13 @@ public class BookCopyService {
                 .toList();
     }
 
-    @Cacheable(cacheNames = "book-copy-counts", key = "'total:' + #bookId")
-    public long getTotalCopies(Long bookId) {
-        return bookCopyRepository.countByBook_BookId(bookId);
+    @Cacheable(cacheNames = "book-copy-counts", key = "'total:' + #title")
+    public long getTotalCopies(String title) {
+        return bookCopyRepository.countByTitle(title);
     }
 
-    @Cacheable(cacheNames = "book-copy-counts", key = "'available:' + #bookId")
-    public long getAvailableCopies(Long bookId) {
-        return bookCopyRepository.countByBook_BookIdAndStatus(bookId, BookCopyStatus.AVAILABLE);
-    }
-
-    private Book findBook(Long bookId) {
-        return bookRepository.findById(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("Book not found"));
+    @Cacheable(cacheNames = "book-copy-counts", key = "'available:' + #title")
+    public long getAvailableCopies(String title) {
+        return bookCopyRepository.countByTitleAndStatus(title, BookCopyStatus.AVAILABLE);
     }
 }

@@ -7,7 +7,7 @@ public record BookReturnedEvent(
         Long transactionId,
         Long userId,
         Long bookCopyId,
-        Long bookId,
+        String title,
         LocalDate returnedAt,
         Instant occurredAt
 ) {

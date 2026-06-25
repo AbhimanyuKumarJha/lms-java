@@ -34,7 +34,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: com.example.lms.books.events,com.example.lms.borrowing.events,com.example.lms.fines.events,com.example.lms.auth.events,com.example.lms.users.events
+        spring.json.trusted.packages: com.example.lms.borrowing.events,com.example.lms.fines.events,com.example.lms.auth.events,com.example.lms.users.events
     listener:
       missing-topics-fatal: false
 server:

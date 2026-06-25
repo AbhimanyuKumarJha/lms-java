@@ -5,7 +5,9 @@ import jakarta.validation.constraints.NotNull;
 
 public record CreateBookCopyRequest(
         @NotNull Long bookCopyId,
-        @NotNull Long bookId,
+        @NotBlank String title,
+        @NotBlank String author,
+        String description,
         @NotBlank String copyCode
 ) {
 }

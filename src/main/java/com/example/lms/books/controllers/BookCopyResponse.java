@@ -7,8 +7,9 @@ import java.io.Serializable;
 
 public record BookCopyResponse(
         Long bookCopyId,
-        Long bookId,
         String title,
+        String author,
+        String description,
         String copyCode,
         BookCopyStatus status
 ) implements Serializable {
@@ -16,8 +17,9 @@ public record BookCopyResponse(
     public static BookCopyResponse from(BookCopy bookCopy) {
         return new BookCopyResponse(
                 bookCopy.getBookCopyId(),
-                bookCopy.getBook().getBookId(),
-                bookCopy.getBook().getTitle(),
+                bookCopy.getTitle(),
+                bookCopy.getAuthor(),
+                bookCopy.getDescription(),
                 bookCopy.getCopyCode(),
                 bookCopy.getStatus()
         );

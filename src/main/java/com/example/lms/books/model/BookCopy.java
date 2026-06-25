@@ -4,10 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -16,9 +13,12 @@ public class BookCopy {
 
     @Id
     private Long bookCopyId;
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "book_id", nullable = false)
-    private Book book;
+    @Column(nullable = false)
+    private String title;
+    @Column(nullable = false)
+    private String author;
+    @Column(length = 1000)
+    private String description;
     @Column(nullable = false, unique = true)
     private String copyCode;
     @Enumerated(EnumType.STRING)
@@ -29,9 +29,11 @@ public class BookCopy {
         this.status = BookCopyStatus.AVAILABLE;
     }
 
-    public BookCopy(Long bookCopyId, Book book, String copyCode) {
+    public BookCopy(Long bookCopyId, String title, String author, String description, String copyCode) {
         this.bookCopyId = bookCopyId;
-        this.book = book;
+        this.title = title;
+        this.author = author;
+        this.description = description;
         this.copyCode = copyCode;
         this.status = BookCopyStatus.AVAILABLE;
     }
@@ -56,12 +58,28 @@ public class BookCopy {
         this.bookCopyId = bookCopyId;
     }
 
-    public Book getBook() {
-        return book;
+    public String getTitle() {
+        return title;
     }
 
-    public void setBook(Book book) {
-        this.book = book;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getCopyCode() {

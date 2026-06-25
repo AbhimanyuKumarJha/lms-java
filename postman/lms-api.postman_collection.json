@@ -11,24 +11,6 @@
       "item": [
         {
           "name": "Signup",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Signup returns success', function () {",
-                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-                  "});",
-                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
-                  "  const body = pm.response.json();",
-                  "  if (body.userId) pm.environment.set('userId', body.userId);",
-                  "  if (body.email) pm.environment.set('email', body.email);",
-                  "}"
-                ]
-              }
-            }
-          ],
           "request": {
             "method": "POST",
             "header": [
@@ -47,7 +29,7 @@
               }
             },
             "url": "{{baseUrl}}/api/auth/signup",
-            "description": "Creates an unverified user and prints the OTP in the Spring Boot terminal through the notification listener."
+            "description": "Creates an unverified user, generates an OTP, stores it in Redis, and publishes a signup OTP event."
           }
         },
         {
@@ -70,7 +52,7 @@
               }
             },
             "url": "{{baseUrl}}/api/otp/verify",
-            "description": "Copy the OTP from the Spring Boot terminal into the environment variable named otp before sending."
+            "description": "Copy the generated OTP from your configured notification path into the environment variable named otp before sending."
           }
         }
       ]
@@ -80,21 +62,6 @@
       "item": [
         {
           "name": "Create User",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
-                  "  const body = pm.response.json();",
-                  "  if (body.userId) pm.environment.set('userId', body.userId);",
-                  "  if (body.email) pm.environment.set('email', body.email);",
-                  "}"
-                ]
-              }
-            }
-          ],
           "request": {
             "method": "POST",
             "header": [
@@ -143,57 +110,6 @@
       ]
     },
     {
-      "name": "Books",
-      "item": [
-        {
-          "name": "Create Book",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"bookId\": {{bookId}},\n  \"title\": \"Clean Architecture\",\n  \"author\": \"Robert C. Martin\",\n  \"description\": \"A practical guide to software architecture principles.\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": "{{baseUrl}}/api/books"
-          }
-        },
-        {
-          "name": "Get Books",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/books"
-          }
-        },
-        {
-          "name": "Get Total Copies",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/books/{{bookId}}/copies/total"
-          }
-        },
-        {
-          "name": "Get Available Copies",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/books/{{bookId}}/copies/available"
-          }
-        }
-      ]
-    },
-    {
       "name": "Book Copies",
       "item": [
         {
@@ -208,7 +124,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"bookCopyId\": {{bookCopyId}},\n  \"bookId\": {{bookId}},\n  \"copyCode\": \"{{copyCode}}\"\n}",
+              "raw": "{\n  \"bookCopyId\": {{bookCopyId}},\n  \"title\": \"{{bookTitle}}\",\n  \"author\": \"{{bookAuthor}}\",\n  \"description\": \"{{bookDescription}}\",\n  \"copyCode\": \"{{copyCode}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -224,6 +140,22 @@
             "method": "GET",
             "header": [],
             "url": "{{baseUrl}}/api/book-copies"
+          }
+        },
+        {
+          "name": "Get Total Copies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/book-copies/titles/{{bookTitlePath}}/copies/total"
+          }
+        },
+        {
+          "name": "Get Available Copies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/book-copies/titles/{{bookTitlePath}}/copies/available"
           }
         }
       ]

@@ -19,19 +19,18 @@ Recommended flow:
 1. Start Docker services: PostgreSQL, Redis, Kafka
 2. Start Spring Boot app
 3. Signup user
-4. Copy OTP from Spring Boot terminal logs
+4. Deliver or inspect the generated signup OTP through your configured notification path
 5. Verify OTP
-6. Create book
-7. Create book copy
-8. Borrow book
-9. Return book
+6. Create book copy
+7. Borrow book
+8. Return book
 ```
 
 ## Auth APIs
 
 ### Signup
 
-Creates an unverified user, hashes the password, generates a 6-digit OTP, stores the hashed OTP in Redis, and publishes a Kafka event. The notification listener prints the plain OTP in the Spring Boot terminal.
+Creates an unverified user, hashes the password, generates a 6-digit OTP, stores the hashed OTP in Redis, and publishes a Kafka event. Notification delivery is currently stubbed.
 
 ```http
 POST /api/auth/signup
@@ -49,13 +48,7 @@ Payload:
 
 What to do:
 
-After sending this request, check your Spring Boot terminal for a log like:
-
-```text
-Signup OTP for email=asha@example.com is 123456
-```
-
-Copy that OTP into the Postman environment variable named `otp`.
+Use your configured notification path to get the generated OTP, then copy it into the Postman environment variable named `otp`.
 
 ### Verify OTP
 
@@ -76,7 +69,7 @@ Payload:
 
 What to do:
 
-Use the OTP printed in the Spring Boot terminal. Do not use the example value unless it matches your actual terminal OTP.
+Use the generated OTP. Do not use the example value unless it matches the actual OTP for that email.
 
 ## User APIs
 
@@ -157,90 +150,11 @@ Payload:
 No request body.
 ```
 
-## Book APIs
-
-### Create Book
-
-Creates a book record.
-
-```http
-POST /api/books
-```
-
-Payload:
-
-```json
-{
-  "bookId": 101,
-  "title": "Clean Architecture",
-  "author": "Robert C. Martin",
-  "description": "A practical guide to software architecture principles."
-}
-```
-
-What to do:
-
-Create a book before creating a book copy.
-
-### Get Books
-
-Returns all books. This response is Redis-cacheable in the app.
-
-```http
-GET /api/books
-```
-
-Payload:
-
-```text
-No request body.
-```
-
-### Get Total Copies
-
-Returns total copies for a book.
-
-```http
-GET /api/books/{bookId}/copies/total
-```
-
-Example:
-
-```http
-GET /api/books/101/copies/total
-```
-
-Payload:
-
-```text
-No request body.
-```
-
-### Get Available Copies
-
-Returns available copies for a book.
-
-```http
-GET /api/books/{bookId}/copies/available
-```
-
-Example:
-
-```http
-GET /api/books/101/copies/available
-```
-
-Payload:
-
-```text
-No request body.
-```
-
 ## Book Copy APIs
 
 ### Create Book Copy
 
-Creates a physical/library copy of an existing book.
+Creates a physical/library copy with the book details stored directly on the copy.
 
 ```http
 POST /api/book-copies
@@ -251,14 +165,12 @@ Payload:
 ```json
 {
   "bookCopyId": 1001,
-  "bookId": 101,
+  "title": "Clean Architecture",
+  "author": "Robert C. Martin",
+  "description": "A practical guide to software architecture principles.",
   "copyCode": "BK-101-COPY-1"
 }
 ```
-
-What to do:
-
-Create the book first. Then create a copy for that `bookId`.
 
 ### Get Book Copies
 
@@ -266,6 +178,46 @@ Returns all book copies.
 
 ```http
 GET /api/book-copies
+```
+
+Payload:
+
+```text
+No request body.
+```
+
+### Get Total Copies
+
+Returns total copies for a title.
+
+```http
+GET /api/book-copies/titles/{title}/copies/total
+```
+
+Example:
+
+```http
+GET /api/book-copies/titles/Clean%20Architecture/copies/total
+```
+
+Payload:
+
+```text
+No request body.
+```
+
+### Get Available Copies
+
+Returns available copies for a title.
+
+```http
+GET /api/book-copies/titles/{title}/copies/available
+```
+
+Example:
+
+```http
+GET /api/book-copies/titles/Clean%20Architecture/copies/available
 ```
 
 Payload:
@@ -300,8 +252,7 @@ Before this request:
 
 ```text
 1. Create or signup a user.
-2. Create a book.
-3. Create a book copy.
+2. Create a book copy.
 ```
 
 ### Borrow Books In Bulk
@@ -374,18 +325,17 @@ asha2@example.com
 
 ### Duplicate IDs
 
-If book, copy, issue, or user creation fails because an ID already exists, change the related Postman environment variable:
+If copy, issue, or user creation fails because an ID already exists, change the related Postman environment variable:
 
 ```text
 userId
-bookId
 bookCopyId
 transactionId
 ```
 
 ### OTP Invalid Or Missing
 
-The OTP expires after 10 minutes. Run signup again with a new email, then copy the new OTP from terminal logs.
+The OTP expires after 10 minutes. Run signup again with a new email, then copy the new OTP from your configured notification path.
 
 ### Kafka Or Redis Errors
 
@@ -394,4 +344,3 @@ Make sure Docker services are running:
 ```powershell
 docker compose up -d postgres redis kafka
 ```
-
